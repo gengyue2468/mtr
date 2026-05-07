@@ -1,4 +1,5 @@
 {
+  "types": ["bun"],
   "compilerOptions": {
     "strict": true,
     "jsx": "react-jsx",

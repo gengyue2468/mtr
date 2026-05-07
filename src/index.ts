@@ -147,6 +147,7 @@ const app = new Hono();
 app.get("/health", (c) => {
   return c.json({ status: "ok" });
 });
+
 app.get("/monitor", authMiddleware, async (c) => {
   try {
     const monitorData = await getMonitorData();
@@ -156,6 +157,7 @@ app.get("/monitor", authMiddleware, async (c) => {
     return c.json({ error: "全坏了，没法拿到 Monitor Data!" }, 500);
   }
 });
+
 app.get("/beszel", authMiddleware, async (c) => {
   try {
     const beszelData = await getBeszelData(await getBeszelToken());
@@ -165,6 +167,7 @@ app.get("/beszel", authMiddleware, async (c) => {
     return c.json({ error: "全坏了，没法拿到 Beszel Data!" }, 500);
   }
 });
+
 app.get("/combined", authMiddleware, async (c) => {
   try {
     const combinedData = await getCombinedData();
@@ -174,4 +177,8 @@ app.get("/combined", authMiddleware, async (c) => {
     return c.json({ error: "全坏了，没法拿到 Combined Data!" }, 500);
   }
 });
-export default app;
+
+export default {
+  port: 6478,
+  fetch: app.fetch,
+};
