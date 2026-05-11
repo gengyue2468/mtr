@@ -189,16 +189,18 @@ app.get("/vps", authMiddleware, async (c) => {
   try {
     const beszelData = await getBeszelData(await getBeszelToken());
     const lines = beszelData.map((vps) => {
-      const { cpu, mp, dp, u } = vps.info;
+      const status = vps.status;
+      const { cpu, mp, dp, u, la } = vps.info;
       const uptimeDay = Math.floor(u / 3600 / 24);
       const uptimeHour = Math.floor((u % (3600 * 24)) / 3600);
       const uptime = `${uptimeDay}d ${uptimeHour}h`;
       return [
-        `${vps.name}`,
-        `CPU     ${brailleBar(cpu)} ${cpu.toFixed(1)}%`,
-        `RAM     ${brailleBar(mp)} ${mp.toFixed(1)}%`,
-        `DISK    ${brailleBar(dp)} ${dp.toFixed(1)}%`,
-        `UPTIME  ${uptime}`,
+        `${vps.name}[${status}]`,
+        `CPU  ${brailleBar(cpu)} ${cpu.toFixed(1)}%`,
+        `RAM  ${brailleBar(mp)} ${mp.toFixed(1)}%`,
+        `DIS  ${brailleBar(dp)} ${dp.toFixed(1)}%`,
+        `UPT  ${uptime}`,
+        `LDA  ${la.map((l) => l.toFixed(2)).join(", ")}`,
       ].join("\n");
     });
     return c.text(lines.join("\n\n"));
