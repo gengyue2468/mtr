@@ -178,6 +178,36 @@ app.get("/combined", authMiddleware, async (c) => {
   }
 });
 
+function brailleBar(percent: number, size = 10): string {
+  const full = "⣿";
+  const empty = "⣀";
+  const filled = Math.round((percent / 100) * size);
+  return full.repeat(filled) + empty.repeat(size - filled);
+}
+
+app.get("/vps", authMiddleware, async (c) => {
+  try {
+    const beszelData = await getBeszelData(await getBeszelToken());
+    const lines = beszelData.map((vps) => {
+      const { cpu, mp, dp, u } = vps.info;
+      const uptimeDay = Math.floor(u / 3600 / 24);
+      const uptimeHour = Math.floor((u % (3600 * 24)) / 3600);
+      const uptime = `${uptimeDay}d ${uptimeHour}h`;
+      return [
+        `${vps.name}`,
+        `CPU     ${brailleBar(cpu)} ${cpu.toFixed(1)}%`,
+        `RAM     ${brailleBar(mp)} ${mp.toFixed(1)}%`,
+        `DISK    ${brailleBar(dp)} ${dp.toFixed(1)}%`,
+        `UPTIME  ${uptime}`,
+      ].join("\n");
+    });
+    return c.text(lines.join("\n\n"));
+  } catch (error) {
+    console.error("全坏了，没法拿到 VPS Data!", error);
+    return c.text("全坏了，没法拿到 VPS Data!", 500);
+  }
+});
+
 export default {
   port: 6478,
   fetch: app.fetch,
